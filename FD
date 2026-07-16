@@ -39,3 +39,14 @@ kubectl get pods
 kubectl get services
 
 minikube service flask-deployment
+
+
+
+vagrant ssh manager
+sudo apt update
+sudo apt install docker.io -y
+sudo systemctl start docker
+sudo systemctl enable docker
+docker --version
+docker swarm init
+docker swarm join-token worker
