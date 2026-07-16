@@ -18,3 +18,24 @@ docker service create --name flask-service -p 5000:5000 flask-app
 docker service ls
 docker service ps flask-service
 docker service scale flask-service=3
+
+
+minikube start
+
+eval $(minikube docker-env)
+
+docker build -t flask-app:latest .
+
+kubectl create deployment flask-deployment --image=flask-app:latest
+
+kubectl scale deployment flask-deployment --replicas=3
+
+kubectl expose deployment flask-deployment --type=NodePort --port=5000
+
+kubectl get deployments
+
+kubectl get pods
+
+kubectl get services
+
+minikube service flask-deployment
