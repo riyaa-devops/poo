@@ -1,3 +1,22 @@
+sudo apt update
+
+sudo apt install -y docker.io
+
+sudo systemctl enable docker
+
+sudo systemctl start docker
+
+sudo systemctl status docker
+
+sudo usermod -aG docker $USER
+
+newgrp docker
+
+docker --version
+
+docker run hello-world
+
+
 docker --version
 docker images
 docker ps
@@ -28,6 +47,27 @@ minikube start
 eval $(minikube docker-env)
 
 docker build -t flask-app:latest .
+
+
+
+
+
+# Install Minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+
+# Install kubectl using Snap
+sudo snap install kubectl --classic
+
+# Verify
+kubectl version --client
+
+# Start Kubernetes
+minikube start --driver=docker
+
+# Check cluster
+kubectl get nodes
+kubectl cluster-info
 
 kubectl create deployment flask-deployment --image=flask-app:latest
 
