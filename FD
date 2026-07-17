@@ -85,6 +85,129 @@ minikube service flask-deployment
 
 
 
+
+# Step 1: Update package index
+sudo apt update
+
+# Step 2: Install required packages
+sudo apt install -y gnupg software-properties-common curl
+
+# Step 3: Add HashiCorp GPG key
+curl -fsSL https://apt.releases.hashicorp.com/gpg | \
+sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+# Step 4: Add HashiCorp repository
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+# Step 5: Update package index
+sudo apt update
+
+
+sudo apt update
+
+# Step 6: Install Vagrant
+sudo apt install -y vagrant
+
+# Step 7: Install VirtualBox
+sudo apt install -y virtualbox
+
+# Step 8: Verify installations
+vagrant --version
+VBoxManage --version
+
+
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "ubuntu/jammy64"
+
+  # Master Node
+  config.vm.define "master" do |master|
+    master.vm.hostname = "master"
+    master.vm.network "private_network", ip: "192.168.56.10"
+    master.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+  end
+
+  # Worker1
+  config.vm.define "worker1" do |worker1|
+    worker1.vm.hostname = "worker1"
+    worker1.vm.network "private_network", ip: "192.168.56.11"
+    worker1.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+  end
+
+  # Worker2
+  config.vm.define "worker2" do |worker2|
+    worker2.vm.hostname = "worker2"
+    worker2.vm.network "private_network", ip: "192.168.56.12"
+    worker2.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+      vb.cpus = 2
+    end
+  end
+
+end
+
+
+# Start all VMs
+vagrant up
+
+# Check VM status
+vagrant status
+
+# SSH into Master
+vagrant ssh master
+
+# Install Docker on Master
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker --version
+docker run hello-world
+
+# Exit Master
+exit
+
+# SSH into Worker1
+vagrant ssh worker1
+
+# Install Docker on Worker1
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker --version
+docker run hello-world
+
+# Exit Worker1
+exit
+
+# SSH into Worker2
+vagrant ssh worker2
+
+# Install Docker on Worker2
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable docker
+sudo systemctl start docker
+sudo usermod -aG docker $USER
+
+
+
+
 vagrant ssh manager
 sudo apt update
 sudo apt install docker.io -y
@@ -93,3 +216,10 @@ sudo systemctl enable docker
 docker --version
 docker swarm init
 docker swarm join-token worker
+
+# If you have multiple network interfaces
+# docker swarm init --advertise-addr <MANAGER-IP>
+
+
+# Create an Nginx service
+docker service create --name nginx --replicas 3 -p 80:80 nginx
